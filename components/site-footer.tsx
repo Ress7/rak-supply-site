@@ -27,8 +27,8 @@ export function SiteFooter() {
               viewport={{ once: true }}
             >
               <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-4xl font-bold chrome-text">RAK</span>
-                <span className="text-xl font-mono text-primary">.2K</span>
+                <span className="text-4xl font-bold chrome-text">Rak</span>
+                <span className="text-xl font-mono text-primary">Supply</span>
               </div>
               <p className="text-muted-foreground max-w-sm mb-6 leading-relaxed">
                 Your destination for rare kicks and authentic Y2K style. We
@@ -141,7 +141,7 @@ export function SiteFooter() {
           className="mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4"
         >
           <p className="text-muted-foreground text-sm font-mono">
-            2025 RAK.2K - ALL RIGHTS RESERVED
+            2025 Rak Supply - ALL RIGHTS RESERVED
           </p>
           <div className="flex gap-6">
             <a

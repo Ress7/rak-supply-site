@@ -52,31 +52,7 @@ export default function CartPage() {
       toast("Your cart is empty.");
       return;
     }
-    try {
-      const payload = {
-        items: items.map((i) => ({
-          id: i.id,
-          name: i.name,
-          priceInCents: Math.round(i.price * 100),
-          quantity: i.quantity,
-        })),
-      };
-      const res = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || "Checkout failed");
-      }
-      const data = await res.json();
-      const url = data?.url;
-      if (!url) throw new Error("No session URL");
-      window.location.href = url;
-    } catch (e: any) {
-      toast.error(e?.message || "Checkout failed");
-    }
+    toast("Checkout is currently disabled.");
   };
 
   return (
@@ -148,9 +124,9 @@ export default function CartPage() {
               </div>
               <button
                 onClick={checkout}
-                className="w-full px-4 py-3 bg-primary text-primary-foreground font-mono cursor-pointer"
+                className="w-full px-4 py-3 bg-muted text-muted-foreground font-mono cursor-not-allowed"
               >
-                CHECKOUT
+                CHECKOUT DISABLED
               </button>
             </div>
           </div>

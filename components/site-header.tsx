@@ -33,10 +33,10 @@ export function SiteHeader() {
             className="flex items-baseline gap-1"
           >
             <span className="text-2xl md:text-3xl font-bold chrome-text">
-              RAK
+              Rak
             </span>
             <span className="text-sm md:text-base font-mono text-primary">
-              .2K
+              Supply
             </span>
           </motion.a>
 

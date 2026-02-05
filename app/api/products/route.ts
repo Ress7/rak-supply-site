@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 
-// Google Sheets public CSV URL format:
-// https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}
-
-const SHEET_URL = process.env.GOOGLE_SHEET_URL;
-const DEFAULT_DESCRIPTION =
-  "High-quality footwear made for comfort, durability, and everyday wear. Designed with premium materials and a clean finish, this shoe delivers a reliable fit and a modern look suitable for any occasion.";
+const FALLBACK_SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1pVp9u2_Z7V6FdGKhKZoJmwrFkTf_O5sQg2jfRgMCEnk/export?format=csv&gid=0";
+const SHEET_URL = process.env.GOOGLE_SHEET_URL || FALLBACK_SHEET_URL;
+const DEFAULT_DESCRIPTION = "High quality 1:1";
 
 interface Product {
   id: string;
@@ -58,7 +56,7 @@ function parseCSV(csv: string): Product[] {
 
   // Find column indexes - supports your exact column names
   const idIdx = headers.findIndex((h) => h === "id" || h === "product_id");
-  const nameIdx = headers.findIndex((h) => h === "item" || h === "name" || h === "product_name" || h === "title");
+  const nameIdx = headers.findIndex((h) => h === "item" || h === "name" || h === "product_name" || h === "title" || h === "data");
   const priceIdx = headers.findIndex((h) => h === "price");
   const imageIdx = headers.findIndex((h) => h === "images" || h === "image" || h === "image_url" || h === "photo");
   const descIdx = headers.findIndex((h) => h === "descripton" || h === "description" || h === "desc"); // Note: supports typo "descripton"
@@ -80,7 +78,7 @@ function parseCSV(csv: string): Product[] {
       description: DEFAULT_DESCRIPTION,
       size: "M US7–US13",
       color: colorIdx >= 0 ? values[colorIdx] || "N/A" : "N/A",
-      category: categoryIdx >= 0 ? values[categoryIdx]?.toUpperCase() || "OTHER" : "OTHER",
+      category: categoryIdx >= 0 ? values[categoryIdx]?.toUpperCase() || "SNEAKERS" : "SNEAKERS",
     };
 
     // Only add products with valid name and price
@@ -127,15 +125,6 @@ function parseCSVLine(line: string): string[] {
 
 export async function GET(request: Request) {
   try {
-    // If no sheet URL is configured, return empty with setup instructions
-    if (!SHEET_URL) {
-      return NextResponse.json({ 
-        products: [],
-        source: "not_configured",
-        message: "Add your GOOGLE_SHEET_URL environment variable to connect your spreadsheet."
-      });
-    }
-
     const url = new URL(request.url);
     const forceRefresh = url.searchParams.get("refresh") === "1";
 

@@ -13,7 +13,7 @@ export default function AboutPage() {
           className="mb-10"
         >
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            About RAK.2K
+            About Rak Supply
           </h1>
           <p className="font-mono text-muted-foreground">
             {">>> FUTURE-PAST FOOTWEAR CULTURE <<<"}

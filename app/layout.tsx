@@ -10,7 +10,7 @@ const _spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: '--font-sans
 const _vt323 = VT323({ weight: "400", subsets: ["latin"], variable: '--font-mono' });
 
 export const metadata: Metadata = {
-  title: 'RAK.2K | Y2K Sneaker Culture',
+  title: 'Rak Supply | Sneaker Culture',
   description: 'Step into the future of footwear. Rare kicks, bold style, Y2K vibes.',
   generator: 'v0.app',
   icons: {

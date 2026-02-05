@@ -55,7 +55,7 @@ export default function ContactPage() {
           <div className="bg-card y2k-border p-6">
             <p className="text-foreground">Thanks — we’ll get back to you.</p>
             <p className="font-mono text-xs text-muted-foreground mt-2">
-              {">>> You can also email us at support@rak2k.example"}
+              {">>> You can also email us at support@raksupply.example"}
             </p>
           </div>
         )}

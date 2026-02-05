@@ -11,7 +11,7 @@ import { MarqueeTicker } from "@/components/marquee-ticker";
 import { CustomCursor } from "@/components/custom-cursor";
 
 const tickerItems = [
-  "RAK.2K - STEP INTO THE FUTURE",
+  "Rak Supply - STEP INTO THE FUTURE",
   "FREE SHIPPING WORLDWIDE",
   "LIVE GOOGLE SHEETS SYNC",
   "Y2K ENERGY",

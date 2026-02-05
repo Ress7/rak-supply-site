@@ -22,6 +22,7 @@ export function ProductGrid() {
       refreshInterval: 30000, // Auto-refresh every 30 seconds
     }
   );
+  const [refreshing, setRefreshing] = useState(false);
 
   const products = data?.products || [];
   const categories = ["ALL", ...new Set(products.map((p) => p.category))];
@@ -96,17 +97,23 @@ export function ProductGrid() {
 
           {/* Refresh button */}
           <button
-            onClick={() =>
-              mutate(
+            onClick={async () => {
+              setRefreshing(true);
+              await mutate(
                 async () =>
                   fetch(`/api/products?refresh=1`).then((res) => res.json()),
                 { revalidate: false }
-              )
-            }
-            className="px-4 py-2 font-mono text-sm bg-muted text-muted-foreground hover:bg-muted/80 flex items-center gap-2 cursor-pointer"
+              );
+              setRefreshing(false);
+            }}
+            className={`px-4 py-2 font-mono text-sm flex items-center gap-2 cursor-pointer transition-all ${
+              refreshing
+                ? "bg-primary text-primary-foreground y2k-glow animate-pulse"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
           >
-            <RefreshCw size={14} className={isLoading ? "animate-spin" : ""} />
-            REFRESH
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+            {refreshing ? "REFRESHING..." : "REFRESH"}
           </button>
         </motion.div>
 

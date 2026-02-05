@@ -89,14 +89,14 @@ export function IntroScreen({ onEnter }: IntroScreenProps) {
           className={`text-center ${glitchActive ? "glitch-text" : ""}`}
         >
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter chrome-text">
-            RAK
+            Rak
           </h1>
           <motion.span
             className="text-2xl md:text-4xl font-mono tracking-widest text-primary"
             animate={{ opacity: [1, 0.5, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            .2K
+            Supply
           </motion.span>
         </motion.div>
 
