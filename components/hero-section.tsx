@@ -84,14 +84,13 @@ export function HeroSection() {
             </motion.span>
           </h1>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
           >
-            Rare kicks. Bold style. Authentic Y2K energy.
+            Rare kicks. Bold style. 2,500+ rare kicks in rotation.
             <br />
             <span className="font-mono text-sm text-primary">
               {">>> LIVE INVENTORY FROM OUR VAULT <<<"}
@@ -128,7 +127,7 @@ export function HeroSection() {
           >
             <div className="text-center">
               <div className="text-2xl md:text-3xl font-bold text-primary">
-                500+
+                2500+
               </div>
               <div className="text-muted-foreground">RARE KICKS</div>
             </div>
