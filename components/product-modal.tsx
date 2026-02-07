@@ -162,7 +162,7 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                     {">>> FEATURES"}
                   </h3>
                   <ul className="space-y-1 text-sm text-muted-foreground font-mono">
-                    <li>+ Authentic Y2K Design</li>
+                    <li>+ Bold Y2K Design</li>
                     <li>+ Premium Materials</li>
                     <li>+ Limited Edition</li>
                     <li>+ Free Shipping</li>

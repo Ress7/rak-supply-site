@@ -31,7 +31,7 @@ export function SiteFooter() {
                 <span className="text-xl font-mono text-primary">Supply</span>
               </div>
               <p className="text-muted-foreground max-w-sm mb-6 leading-relaxed">
-                Your destination for rare kicks and authentic Y2K style. We
+                Your destination for rare kicks and bold Y2K style. We
                 curate the finest footwear from the future-past.
               </p>
               <div className="font-mono text-xs text-muted-foreground">

@@ -13,7 +13,10 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export function ProductGrid() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [filter, setFilter] = useState<string>("ALL");
-   const [brandFilter, setBrandFilter] = useState<string | null>(null);
+  const [brandFilter, setBrandFilter] = useState<string | null>(null);
+  const [sort, setSort] = useState<
+    "DEFAULT" | "NAME_ASC" | "PRICE_LOW_HIGH" | "PRICE_HIGH_LOW"
+  >("DEFAULT");
   const { query } = useSearch();
 
   const { data, error, isLoading, mutate } = useSWR<{ products: Product[] }>(
@@ -70,6 +73,19 @@ export function ProductGrid() {
       p.category.toLowerCase().includes(q) ||
       p.color.toLowerCase().includes(q)
     );
+  });
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (sort === "NAME_ASC") {
+      return a.name.localeCompare(b.name);
+    }
+    if (sort === "PRICE_LOW_HIGH") {
+      return a.price - b.price;
+    }
+    if (sort === "PRICE_HIGH_LOW") {
+      return b.price - a.price;
+    }
+    return 0;
   });
 
   if (error) {
@@ -183,13 +199,61 @@ export function ProductGrid() {
           </div>
         )}
 
-        {/* Products grid */}
-        {!isLoading && filteredProducts.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="flex flex-wrap justify-center gap-2 mb-6"
+        >
+          <span className="font-mono text-xs text-muted-foreground">Sort:</span>
+          <button
+            onClick={() => setSort("DEFAULT")}
+            className={`px-3 py-1 font-mono text-xs transition-all cursor-pointer ${
+              sort === "DEFAULT"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            Default
+          </button>
+          <button
+            onClick={() => setSort("NAME_ASC")}
+            className={`px-3 py-1 font-mono text-xs transition-all cursor-pointer ${
+              sort === "NAME_ASC"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            A-Z
+          </button>
+          <button
+            onClick={() => setSort("PRICE_LOW_HIGH")}
+            className={`px-3 py-1 font-mono text-xs transition-all cursor-pointer ${
+              sort === "PRICE_LOW_HIGH"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            Price ↑
+          </button>
+          <button
+            onClick={() => setSort("PRICE_HIGH_LOW")}
+            className={`px-3 py-1 font-mono text-xs transition-all cursor-pointer ${
+              sort === "PRICE_HIGH_LOW"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            Price ↓
+          </button>
+        </motion.div>
+
+        {!isLoading && sortedProducts.length > 0 && (
           <motion.div
             layout
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           >
-            {filteredProducts.map((product, index) => (
+            {sortedProducts.map((product, index) => (
               <ProductCard
                 key={product.id}
                 product={product}

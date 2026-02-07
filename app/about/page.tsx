@@ -25,7 +25,7 @@ export default function AboutPage() {
             <p className="text-muted-foreground leading-relaxed">
               We curate high-quality footwear made for comfort, durability, and
               everyday wear. Inspired by Y2K energy and modern design, every
-              pair is selected for authenticity and style.
+              pair is selected for quality and style.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Our inventory syncs live from our internal systems to ensure you
@@ -37,7 +37,7 @@ export default function AboutPage() {
           <div className="bg-card y2k-border p-6 space-y-4">
             <h2 className="font-bold text-xl text-foreground">Values</h2>
             <ul className="font-mono text-sm text-muted-foreground space-y-2">
-              <li>+ Authentic materials</li>
+              <li>+ Premium materials</li>
               <li>+ Reliable fit and build</li>
               <li>+ Clean design language</li>
               <li>+ Transparent availability</li>
