@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
-const FALLBACK_SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/1pVp9u2_Z7V6FdGKhKZoJmwrFkTf_O5sQg2jfRgMCEnk/export?format=csv&gid=0";
-const SHEET_URL = process.env.GOOGLE_SHEET_URL || FALLBACK_SHEET_URL;
 const DEFAULT_DESCRIPTION = "High quality 1:1";
 
 interface Product {
@@ -16,144 +14,99 @@ interface Product {
   category: string;
 }
 
-const DEMO_PRODUCTS: Product[] = [
-  {
-    id: "1",
-    name: "Demo Product 1",
-    price: 19.99,
-    image: "https://example.com/demo1.jpg",
-    description: "This is a demo product.",
-    size: "S,M,L",
-    color: "Black",
-    category: "SNEAKERS"
-  },
-  {
-    id: "2",
-    name: "Demo Product 2",
-    price: 29.99,
-    image: "https://example.com/demo2.jpg",
-    description: "This is another demo product.",
-    size: "9-12",
-    color: "White",
-    category: "BOOTS"
-  }
-];
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  "https://usbcfgglcxbtyjxvmdyp.supabase.co";
+const SUPABASE_ANON_KEY =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVzYmNmZ2dsY3hidHlqeHZtZHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2NTY5MTEsImV4cCI6MjA4NjIzMjkxMX0.oTeZuPIu4hkp4BNm1c6UvQTPtVT0uNsh_HgqDO_AaQo";
 
-// Spreadsheet column mapping guide:
-// Your Google Sheet should have these columns (case-insensitive):
-// - ITEM (or name, product_name, title) - Product name
-// - DESCRIPTON (or description, desc) - Product description text
-// - SIZE RANGE (or size, sizes) - Available sizes (e.g., "9-12" or "S,M,L")
-// - PRICE - Price in dollars (numbers only, no currency symbol)
-// - IMAGES (or image, image_url, photo) - Full URL to product image
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function parseCSV(csv: string): Product[] {
-  const lines = csv.split("\n");
-  if (lines.length < 2) return [];
+function coerceProduct(row: any, index: number): Product | null {
+  const data =
+    typeof row.data === "string"
+      ? safeParseJSON(row.data)
+      : row.data || {};
 
-  // Parse header row
-  const headers = parseCSVLine(lines[0]).map((h) => h.toLowerCase().trim());
+  const name =
+    (data?.name as string) ||
+    (data?.title as string) ||
+    (data?.item as string) ||
+    "Unnamed Product";
+  const price =
+    typeof row.price === "number"
+      ? row.price
+      : Number(row.price) || 0;
+  const image =
+    (row.image as string) ||
+    (data?.image as string) ||
+    (data?.image_url as string) ||
+    "";
 
-  // Find column indexes - supports your exact column names
-  const idIdx = headers.findIndex((h) => h === "id" || h === "product_id");
-  const nameIdx = headers.findIndex((h) => h === "item" || h === "name" || h === "product_name" || h === "title" || h === "data");
-  const priceIdx = headers.findIndex((h) => h === "price");
-  const imageIdx = headers.findIndex((h) => h === "images" || h === "image" || h === "image_url" || h === "photo");
-  const descIdx = headers.findIndex((h) => h === "descripton" || h === "description" || h === "desc"); // Note: supports typo "descripton"
-  const sizeIdx = headers.findIndex((h) => h === "size range" || h === "size" || h === "sizes");
-  const colorIdx = headers.findIndex((h) => h === "color" || h === "colour");
-  const categoryIdx = headers.findIndex((h) => h === "category" || h === "type");
+  const description =
+    (data?.description as string) ||
+    (data?.desc as string) ||
+    DEFAULT_DESCRIPTION;
+  const size =
+    (data?.size as string) ||
+    (data?.sizes as string) ||
+    (data?.size_range as string) ||
+    "M US7–US13";
+  const color = (data?.color as string) || "N/A";
+  const category = (
+    (data?.category as string) ||
+    (data?.type as string) ||
+    "SNEAKERS"
+  ).toUpperCase();
 
-  const products: Product[] = [];
+  if (!name || price <= 0) return null;
 
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
-    if (values.length < 2) continue;
-
-    const product: Product = {
-      id: idIdx >= 0 ? values[idIdx] || String(i) : String(i),
-      name: nameIdx >= 0 ? values[nameIdx] || "Unnamed Product" : "Unnamed Product",
-      price: priceIdx >= 0 ? parsePrice(values[priceIdx]) : 0,
-      image: imageIdx >= 0 ? values[imageIdx] || "" : "",
-      description: DEFAULT_DESCRIPTION,
-      size: "M US7–US13",
-      color: colorIdx >= 0 ? values[colorIdx] || "N/A" : "N/A",
-      category: categoryIdx >= 0 ? values[categoryIdx]?.toUpperCase() || "SNEAKERS" : "SNEAKERS",
-    };
-
-    // Only add products with valid name and price
-    if (product.name && product.price > 0) {
-      products.push(product);
-    }
-  }
-
-  return products;
+  return {
+    id: String(row.id ?? index + 1),
+    name,
+    price,
+    image,
+    description,
+    size,
+    color,
+    category,
+  };
 }
 
-function parsePrice(raw: string): number {
-  const cleaned = (raw || "").replace(/[^0-9.\-]/g, "");
-  const val = parseFloat(cleaned);
-  return isNaN(val) ? 0 : val;
-}
-
-function parseCSVLine(line: string): string[] {
-  const values: string[] = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (char === "," && !inQuotes) {
-      values.push(current.trim());
-      current = "";
-    } else {
-      current += char;
-    }
+function safeParseJSON(raw: string) {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
   }
-
-  values.push(current.trim());
-  return values;
 }
 
 export async function GET(request: Request) {
   try {
-    const url = new URL(request.url);
-    const forceRefresh = url.searchParams.get("refresh") === "1";
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, price, data, image");
 
-    // Fetch data from Google Sheets
-    const response = await fetch(SHEET_URL, {
-      next: { revalidate: forceRefresh ? 0 : 10 },
-      cache: forceRefresh ? "no-store" : "force-cache",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sheet: ${response.status}`);
+    if (error) {
+      throw error;
     }
 
-    const csv = await response.text();
-    const products = parseCSV(csv);
+    const products = (data || [])
+      .map((row, idx) => coerceProduct(row, idx))
+      .filter((p): p is Product => !!p);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       products,
-      source: "google_sheets",
-      lastUpdated: new Date().toISOString()
+      source: "supabase",
+      lastUpdated: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
-    
-    // Return empty on error with message
+    console.error("Error fetching products from Supabase:", error);
     return NextResponse.json({
       products: [],
       source: "error",
-      error: "Failed to fetch from Google Sheets. Check your GOOGLE_SHEET_URL."
+      error: "Failed to fetch from Supabase. Verify URL, anon key, and table schema.",
     });
   }
 }
